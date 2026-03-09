@@ -1,0 +1,184 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("VIEWER") // "ADMIN" | "EDITOR" | "VIEWER"
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+
+
+model Department {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  batches  Batch[]
+  faculty  Faculty[]
+}
+
+model Batch {
+  id            String   @id @default(cuid())
+  program       String?
+  departmentId  String
+  startYear     Int
+  endYear       Int
+  durationYears Int      @default(4)
+  sectionsCount Int
+  createdAt     DateTime @default(now())
+
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+
+  sections  Section[]
+  semesters Semester[]
+}
+
+model Section {
+  id           String   @id @default(cuid())
+  batchId      String
+  sectionIndex Int
+  name         String
+  createdAt    DateTime @default(now())
+
+  batch Batch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+
+  assignments      TeachingAssignment[]
+  timetableEntries TimetableEntry[]
+
+  @@unique([batchId, sectionIndex])
+  @@unique([batchId, name])
+}
+
+model Semester {
+  id                 String   @id @default(cuid())
+  batchId            String
+  semesterNo         Int
+  daysPerWeek        Int      @default(6)
+  periodsPerDay      Int      @default(6)
+  periodDurationMins Int      @default(60)
+  dayStartTime       String   @default("09:40")
+  lunchStartTime     String   @default("12:40")
+  lunchEndTime       String   @default("13:20")
+  createdAt          DateTime @default(now())
+
+  batch       Batch                @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  subjects    Subject[]
+  assignments TeachingAssignment[]
+  timetables  Timetable[]
+
+  @@unique([batchId, semesterNo])
+}
+
+model Faculty {
+  id              String   @id @default(cuid())
+  name            String
+  departmentId    String
+  maxHoursPerWeek Int      @default(16)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+
+  assignmentLinks TeachingAssignmentFaculty[]
+  entryLinks      TimetableEntryFaculty[]
+}
+
+model Subject {
+  id               String   @id @default(cuid())
+  semesterId       String
+  code             String?
+  name             String
+  type             String // "THEORY" | "LAB" | "NON_CREDIT"
+  labDurationHours Int? // only if LAB: 2 or 3
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+
+  semester    Semester             @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  assignments TeachingAssignment[]
+  entries     TimetableEntry[]
+}
+
+model TeachingAssignment {
+  id         String   @id @default(cuid())
+  semesterId String
+  sectionId  String
+  subjectId  String
+  createdAt  DateTime @default(now())
+
+  semester Semester @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  section  Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  subject  Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  faculties TeachingAssignmentFaculty[]
+
+  @@unique([semesterId, sectionId, subjectId])
+}
+
+model TeachingAssignmentFaculty {
+  id           String   @id @default(cuid())
+  assignmentId String
+  facultyId    String
+  createdAt    DateTime @default(now())
+
+  assignment TeachingAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  faculty    Faculty           @relation(fields: [facultyId], references: [id], onDelete: Restrict)
+
+  @@unique([assignmentId, facultyId])
+}
+
+model Timetable {
+  id         String   @id @default(cuid())
+  semesterId String
+  versionNo  Int
+  status     String // "ACTIVE" or "INACTIVE"
+  createdBy  String?
+  createdAt  DateTime @default(now())
+
+  semester Semester         @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  entries  TimetableEntry[]
+
+  @@unique([semesterId, versionNo])
+}
+
+model TimetableEntry {
+  id          String   @id @default(cuid())
+  timetableId String
+  sectionId   String
+  dayOfWeek   Int // 1..6
+  periodNo    Int // 1..6
+  subjectId   String
+  blockId     String? // same for lab consecutive hours
+  createdAt   DateTime @default(now())
+
+  timetable Timetable @relation(fields: [timetableId], references: [id], onDelete: Cascade)
+  section   Section   @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  subject   Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  faculties TimetableEntryFaculty[]
+
+  @@unique([timetableId, sectionId, dayOfWeek, periodNo])
+}
+
+model TimetableEntryFaculty {
+  id               String   @id @default(cuid())
+  timetableEntryId String
+  facultyId        String
+  createdAt        DateTime @default(now())
+
+  entry   TimetableEntry @relation(fields: [timetableEntryId], references: [id], onDelete: Cascade)
+  faculty Faculty       @relation(fields: [facultyId], references: [id], onDelete: Restrict)
+
+  @@unique([timetableEntryId, facultyId])
+}

@@ -1,0 +1,244 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap");
+
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600;700&display=swap");
+
+@import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap");
+
+/* Periodix Design System - Calm, Minimal, Faculty-Friendly */
+
+@layer base {
+  :root {
+    --background: 60 4% 95%;
+    --foreground: 24 9% 10%;
+
+    --card: 60 9% 97%;
+    --card-foreground: 24 9% 10%;
+
+    --popover: 20 5% 90%;
+    --popover-foreground: 24 9% 10%;
+
+    --primary: 37 92% 50%;
+    --primary-foreground: 47 100% 96%;
+
+    --secondary: 24 5% 44%;
+    --secondary-foreground: 60 9% 97%;
+
+    --muted: 23 5% 82%;
+    --muted-foreground: 24 9% 10%;
+
+    --accent: 47 100% 96%;
+    --accent-foreground: 37 92% 50%;
+
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 85% 97%;
+
+    --success: 145 50% 42%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 35 90% 52%;
+    --warning-foreground: 35 90% 15%;
+
+    --border: 23 5% 82%;
+    --input: 23 5% 82%;
+    --ring: 37 92% 50%;
+
+    --radius: 1rem;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 24 9% 10%;
+    --sidebar-primary: 37 92% 50%;
+    --sidebar-primary-foreground: 47 100% 96%;
+    --sidebar-accent: 24 5% 44%;
+    --sidebar-accent-foreground: 60 9% 97%;
+    --sidebar-border: 23 5% 82%;
+    --sidebar-ring: 37 92% 50%;
+
+    /* Custom tokens */
+    --shadow-soft: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+    --shadow-card: 0 2px 8px -2px rgb(0 0 0 / 0.06), 0 4px 12px -4px rgb(0 0 0 / 0.04);
+    --chart-1: 45 96% 64%;
+    --chart-2: 47 95% 53%;
+    --chart-3: 43 96% 56%;
+    --chart-4: 37 92% 50%;
+    --chart-5: 24 5% 44%;
+    --sidebar: 60 9% 97%;
+    --font-sans: 'Source Sans Pro', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+    --font-serif: 'Source Serif Pro', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+    --font-mono: 'Source Code Pro', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
+    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
+    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
+    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+    --tracking-normal: 0em;
+    --spacing: 0.25rem;
+  }
+
+  .dark {
+    --background: 24 9% 10%;
+    --foreground: 60 9% 97%;
+
+    --card: 12 6% 15%;
+    --card-foreground: 60 9% 97%;
+
+    --popover: 30 6% 25%;
+    --popover-foreground: 60 9% 97%;
+
+    --primary: 43 96% 56%;
+    --primary-foreground: 20 91% 14%;
+
+    --secondary: 24 5% 44%;
+    --secondary-foreground: 60 9% 97%;
+
+    --muted: 24 5% 44%;
+    --muted-foreground: 60 9% 97%;
+
+    --accent: 25 83% 14%;
+    --accent-foreground: 47 95% 53%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 85% 97%;
+
+    --success: 145 45% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 35 85% 55%;
+    --warning-foreground: 35 90% 10%;
+
+    --border: 33 5% 32%;
+    --input: 33 5% 32%;
+    --ring: 43 96% 56%;
+
+    --sidebar-background: 220 18% 11%;
+    --sidebar-foreground: 60 9% 97%;
+    --sidebar-primary: 43 96% 56%;
+    --sidebar-primary-foreground: 20 91% 14%;
+    --sidebar-accent: 47 95% 53%;
+    --sidebar-accent-foreground: 25 83% 14%;
+    --sidebar-border: 33 5% 32%;
+    --sidebar-ring: 43 96% 56%;
+    --chart-1: 45 96% 64%;
+    --chart-2: 48 96% 76%;
+    --chart-3: 43 96% 56%;
+    --chart-4: 37 92% 50%;
+    --chart-5: 33 5% 32%;
+    --sidebar: 12 6% 15%;
+    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
+    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
+    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
+    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+@layer components {
+  .card-soft {
+    @apply bg-card rounded-lg border border-border;
+    box-shadow: var(--shadow-card);
+  }
+
+  .btn-subtle {
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium 
+           transition-colors focus-visible:outline-none focus-visible:ring-2 
+           focus-visible:ring-ring px-4 py-2 bg-secondary text-secondary-foreground 
+           hover:bg-accent;
+  }
+
+  .input-clean {
+    @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 
+           text-sm placeholder:text-muted-foreground focus:outline-none 
+           focus:ring-2 focus:ring-ring focus:ring-offset-1 
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .status-badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  .status-success {
+    @apply status-badge bg-success/10 text-success;
+  }
+
+  .status-warning {
+    @apply status-badge bg-warning/10 text-warning-foreground;
+  }
+
+  .status-error {
+    @apply status-badge bg-destructive/10 text-destructive;
+  }
+
+  .page-header {
+    @apply mb-6;
+  }
+
+  .page-title {
+    @apply text-2xl font-semibold text-foreground tracking-tight;
+  }
+
+  .page-description {
+    @apply text-muted-foreground mt-1;
+  }
+
+  .section-title {
+    @apply text-base font-medium text-foreground mb-3;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fade-in 0.2s ease-out;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-in {
+    animation: slide-in 0.2s ease-out;
+  }
+
+  @keyframes slide-in {
+    from {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}
