@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Calendar,
@@ -62,16 +62,16 @@ export default function Dashboard() {
   const [activeEntries, setActiveEntries] = useState<TimetableEntry[]>([]);
   const [facultyLoad, setFacultyLoad] = useState<FacultyLoadItem[]>([]);
 
-   // ✅ get selected batch reactively (depends on selectedBatchId + batches)
+   // âœ… get selected batch reactively (depends on selectedBatchId + batches)
   const selectedBatch = useMemo(() => {
     if (!selectedBatchId) return null;
     return batches.find((b) => b.id === selectedBatchId) || null;
   }, [batches, selectedBatchId]);
 
-  // ✅ departmentId updates instantly when batch changes
+  // âœ… departmentId updates instantly when batch changes
   const selectedDeptId = selectedBatch?.departmentId ?? null;
 
-  // ✅ Filter faculty instantly
+  // âœ… Filter faculty instantly
   const facultyForThisBatch = useMemo(() => {
     const activeOnly = faculty.filter((f) => f.isActive !== false);
     if (!selectedDeptId) return activeOnly;
@@ -83,12 +83,13 @@ export default function Dashboard() {
     let cancelled = false;
 
     async function fetchAll() {
-      if (!selectedSemesterId || !selectedDeptId) return;
-const [subjectsRes, facultyRes, assignmentsRes] = await Promise.all([
-  getSubjects(selectedSemesterId),
-  getFaculty(selectedDeptId),
-  getAssignments(selectedSemesterId),
-]);
+      if (!selectedSemesterId) {
+        setSubjectsCount(0);
+        setAssignmentsCount(0);
+        setActiveEntries([]);
+        setSelectedTimetableId(null);
+        return;
+      }
 
       setLoading(true);
 
@@ -98,7 +99,6 @@ const [subjectsRes, facultyRes, assignmentsRes] = await Promise.all([
           getFaculty(selectedDeptId || undefined),
           getAssignments(selectedSemesterId),
         ]);
-
         if (cancelled) return;
 
         if (subjectsRes.data) setSubjectsCount(subjectsRes.data.length);
@@ -164,7 +164,7 @@ const [subjectsRes, facultyRes, assignmentsRes] = await Promise.all([
     return () => {
       cancelled = true;
     };
-  }, [selectedSemesterId, setFaculty, toast, setSelectedTimetableId]);
+  }, [selectedSemesterId, selectedDeptId, setFaculty, toast, setSelectedTimetableId]);
 
   // 2) Compute faculty load from ACTIVE timetable entries
   useEffect(() => {
@@ -220,7 +220,7 @@ const [subjectsRes, facultyRes, assignmentsRes] = await Promise.all([
       return;
     }
 
-    // ✅ Better filename: Batch + Semester + Timetable
+    // âœ… Better filename: Batch + Semester + Timetable
     const batch = getSelectedBatch();
     const sem = getSelectedSemester();
 
@@ -321,7 +321,7 @@ const [subjectsRes, facultyRes, assignmentsRes] = await Promise.all([
           >
             <div className="space-y-1">
               <StatItem label="Subjects" value={subjectsCount} />
-              {/* ✅ Department-filtered count */}
+              {/* âœ… Department-filtered count */}
               <StatItem label="Faculty Active" value={facultyForThisBatch.length} />
               <StatItem
                 label="Assignments"
@@ -422,3 +422,5 @@ const [subjectsRes, facultyRes, assignmentsRes] = await Promise.all([
     </div>
   );
 }
+
+

@@ -1,4 +1,4 @@
-// backend/index.js
+﻿// backend/index.js
 const express = require("express");
 const cors = require("cors");
 const crypto = require("crypto");
@@ -20,6 +20,10 @@ app.use(express.json());
 // --------------------
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-me";
 const TOKEN_EXPIRY = "7d";
+
+if (!process.env.JWT_SECRET) {
+  console.warn("[auth] JWT_SECRET not set. Using insecure fallback secret for development only.");
+}
 
 function signToken(user) {
   return jwt.sign(
@@ -245,7 +249,7 @@ app.patch("/api/users/:id", requireAuth, requireRole("ADMIN"), async (req, res) 
 // --------------------
 // Department APIs
 // --------------------
-app.get("/api/departments", async (req, res) => {
+app.get("/api/departments", requireAuth, async (req, res) => {
   try {
     const departments = await prisma.department.findMany({
       orderBy: { name: "asc" },
@@ -265,7 +269,7 @@ app.post("/api/departments", requireAuth, requireRole("ADMIN"), async (req, res)
       return res.status(400).json({ ok: false, error: "Department name is required" });
     }
 
-    // Upsert by unique name (nice UX for “create if not exists”)
+    // Upsert by unique name (nice UX for â€œcreate if not existsâ€)
     const dept = await prisma.department.upsert({
       where: { name },
       update: {},
@@ -354,7 +358,7 @@ app.post("/api/batches", requireAuth, requireRole("ADMIN"), async (req, res) => 
   }
 });
 
-app.get("/api/batches", async (req, res) => {
+app.get("/api/batches", requireAuth, async (req, res) => {
   try {
     const batches = await prisma.batch.findMany({
       include: {
@@ -481,7 +485,7 @@ app.delete("/api/faculty/:id", requireAuth, requireRole("ADMIN", "EDITOR"), asyn
 // --------------------
 // Subject APIs (Semester-wise)
 // --------------------
-app.post("/api/semesters/:semesterId/subjects", async (req, res) => {
+app.post("/api/semesters/:semesterId/subjects", requireAuth, requireRole("ADMIN", "EDITOR"), async (req, res) => {
   try {
     const { semesterId } = req.params;
     const { name, code, type, labDurationHours } = req.body;
@@ -532,7 +536,7 @@ app.post("/api/semesters/:semesterId/subjects", async (req, res) => {
   }
 });
 
-app.get("/api/semesters/:semesterId/subjects", async (req, res) => {
+app.get("/api/semesters/:semesterId/subjects", requireAuth, async (req, res) => {
   try {
     const { semesterId } = req.params;
 
@@ -550,11 +554,11 @@ app.get("/api/semesters/:semesterId/subjects", async (req, res) => {
 
 // --------------------
 // Teaching Assignment APIs
-// - One subject per section (unique) ✅
-// - THEORY/NON_CREDIT: exactly 1 faculty ✅
-// - LAB: 1..3 faculties ✅
-// - Replace faculties if assignment already exists ✅
-// - Returns warning if any selected faculty exceeds weekly load ✅
+// - One subject per section (unique) âœ…
+// - THEORY/NON_CREDIT: exactly 1 faculty âœ…
+// - LAB: 1..3 faculties âœ…
+// - Replace faculties if assignment already exists âœ…
+// - Returns warning if any selected faculty exceeds weekly load âœ…
 // --------------------
 function normalizeFacultyIds(input) {
   const arr = Array.isArray(input) ? input : input ? [input] : [];
@@ -570,7 +574,7 @@ function normalizeFacultyIds(input) {
   return uniq;
 }
 
-app.post("/api/semesters/:semesterId/assignments", async (req, res) => {
+app.post("/api/semesters/:semesterId/assignments", requireAuth, requireRole("ADMIN", "EDITOR"), async (req, res) => {
   try {
     const { semesterId } = req.params;
     const { sectionId, subjectId, facultyId, facultyIds } = req.body || {};
@@ -721,7 +725,7 @@ app.post("/api/semesters/:semesterId/assignments", async (req, res) => {
   }
 });
 
-app.get("/api/semesters/:semesterId/assignments", async (req, res) => {
+app.get("/api/semesters/:semesterId/assignments", requireAuth, async (req, res) => {
   try {
     const { semesterId } = req.params;
 
@@ -742,7 +746,7 @@ app.get("/api/semesters/:semesterId/assignments", async (req, res) => {
   }
 });
 
-app.delete("/api/assignments/:assignmentId", async (req, res) => {
+app.delete("/api/assignments/:assignmentId", requireAuth, requireRole("ADMIN", "EDITOR"), async (req, res) => {
   try {
     const { assignmentId } = req.params;
 
@@ -759,7 +763,7 @@ app.delete("/api/assignments/:assignmentId", async (req, res) => {
 // Faculty load (for preview in Assignments UI)
 // facultyId -> hours/week (based on assignment links)
 // --------------------
-app.get("/api/semesters/:semesterId/faculty-load", async (req, res) => {
+app.get("/api/semesters/:semesterId/faculty-load", requireAuth, async (req, res) => {
   try {
     const { semesterId } = req.params;
 
@@ -790,7 +794,7 @@ app.get("/api/semesters/:semesterId/faculty-load", async (req, res) => {
 // Theory: fill remaining slots balanced
 // Faculty Load: per-faculty cap (default 16hrs/week)
 // --------------------
-app.post("/api/semesters/:semesterId/timetables/generate", async (req, res) => {
+app.post("/api/semesters/:semesterId/timetables/generate", requireAuth, requireRole("ADMIN", "EDITOR"), async (req, res) => {
   const { semesterId } = req.params;
   const createdBy = req.body?.createdBy || "admin";
 
@@ -1134,7 +1138,7 @@ app.post("/api/semesters/:semesterId/timetables/generate", async (req, res) => {
 });
 
 // ACTIVE timetable endpoint
-app.get("/api/semesters/:semesterId/timetables/active", async (req, res) => {
+app.get("/api/semesters/:semesterId/timetables/active", requireAuth, async (req, res) => {
   try {
     const { semesterId } = req.params;
 
@@ -1151,7 +1155,7 @@ app.get("/api/semesters/:semesterId/timetables/active", async (req, res) => {
 });
 
 // View timetable entries (includes multiple faculty)
-app.get("/api/timetables/:timetableId/entries", async (req, res) => {
+app.get("/api/timetables/:timetableId/entries", requireAuth, async (req, res) => {
   try {
     const { timetableId } = req.params;
     const entries = await prisma.timetableEntry.findMany({
@@ -1170,7 +1174,7 @@ app.get("/api/timetables/:timetableId/entries", async (req, res) => {
 });
 
 // PDF Export
-app.get("/api/timetables/:timetableId/pdf", async (req, res) => {
+app.get("/api/timetables/:timetableId/pdf", requireAuth, async (req, res) => {
   try {
     const { timetableId } = req.params;
 
@@ -1380,3 +1384,9 @@ function buildTimetableHtml(entries, timetableId) {
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+
+
+
+
+
+

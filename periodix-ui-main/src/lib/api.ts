@@ -1,5 +1,6 @@
-// src/lib/api.ts
-const API_BASE = "http://localhost:3001";
+﻿// src/lib/api.ts
+const rawApiBase = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim();
+const API_BASE = (rawApiBase || "http://localhost:3001").replace(/\/+$/, "");
 
 export type ApiResult<T> = { data?: T; error?: string };
 
@@ -498,3 +499,5 @@ export async function getTimetableEntries(
 export async function downloadTimetablePdf(timetableId: string): Promise<ApiResult<Blob>> {
   return requestBlob(`/api/timetables/${timetableId}/pdf`, { method: "GET" });
 }
+
+
